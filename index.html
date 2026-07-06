@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoPulse — Daily Automotive Strategy Briefing</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #161a23;
+      --surface2: #1e2330;
+      --border: #2a2f3d;
+      --accent: #3b82f6;
+      --accent2: #6366f1;
+      --accent3: #10b981;
+      --accent4: #f59e0b;
+      --accent5: #ef4444;
+      --text: #e8eaf0;
+      --muted: #8892a4;
+      --card-hover: #242a38;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0d0f14 0%, #161a23 50%, #1a1f2e 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-text { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
+    .logo-text span { color: var(--accent); }
+    .header-meta {
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+    .date-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .live-dot {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; color: var(--accent3);
+    }
+    .live-dot::before {
+      content: '';
+      width: 8px; height: 8px;
+      background: var(--accent3);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* ── LAYOUT ── */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ── HERO SECTION ── */
+    .hero {
+      margin-bottom: 2.5rem;
+    }
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, #8892a4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 600px;
+    }
+
+    /* ── SIGNAL CARDS (top KPIs) ── */
+    .signals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .signal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .signal-card:hover { background: var(--card-hover); border-color: var(--accent); transform: translateY(-2px); }
+    .signal-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+    .signal-value { font-size: 1.75rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem; }
+    .signal-change {
+      font-size: 0.8rem;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .up { color: var(--accent3); }
+    .down { color: var(--accent5); }
+    .neutral { color: var(--accent4); }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .section-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .section-tag {
+      font-size: 0.7rem;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tag-ev { background: rgba(16,185,129,0.15); color: var(--accent3); }
+    .tag-sdv { background: rgba(99,102,241,0.15); color: var(--accent2); }
+    .tag-av { background: rgba(245,158,11,0.15); color: var(--accent4); }
+    .tag-supply { background: rgba(239,68,68,0.15); color: var(--accent5); }
+    .tag-consumer { background: rgba(59,130,246,0.15); color: var(--accent); }
+    .tag-competitive { background: rgba(168,85,247,0.15); color: #a855f7; }
+
+    /* ── MAIN GRID ── */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .content-grid.three-col {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+    .content-grid.full {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── CHART CARDS ── */
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.2s;
+    }
+    .chart-card:hover { border-color: rgba(59,130,246,0.4); }
+    .chart-card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .chart-card .chart-subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    .chart-container { position: relative; height: 220px; }
+    .chart-container.tall { height: 280px; }
+
+    /* ── TREND CARDS ── */
+    .trend-section {
+      margin-bottom: 2.5rem;
+    }
+    .trend-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .trend-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .trend-card:hover { background: var(--card-hover); border-color: rgba(59,130,246,0.4); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+    .trend-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .trend-card-title { font-size: 0.95rem; font-weight: 700; line-height: 1.3; }
+    .trend-card-source {
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .trend-card-body { font-size: 0.85rem; color: #b0b8c8; line-height: 1.6; }
+    .trend-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .impact-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .impact-high { background: rgba(239,68,68,0.15); color: #f87171; }
+    .impact-medium { background: rgba(245,158,11,0.15); color: var(--accent4); }
+    .impact-watch { background: rgba(59,130,246,0.15); color: var(--accent); }
+    .read-link {
+      font-size: 0.78rem;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+    .read-link:hover { color: #93c5fd; }
+
+    /* ── MARKET DATA TABLE ── */
+    .data-table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    thead th {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(42,47,61,0.5);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--card-hover); }
+    tbody td {
+      padding: 0.85rem 1rem;
+      color: var(--text);
+    }
+    tbody td:first-child { font-weight: 600; }
+    .cagr-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(16,185,129,0.15);
+      color: var(--accent3);
+    }
+    .cagr-pill.high { background: rgba(99,102,241,0.15); color: var(--accent2); }
+
+    /* ── ARTICLES SECTION ── */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .article-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .article-card:hover { background: var(--card-hover); border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+    .article-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+    }
+    .article-title { font-size: 0.9rem; font-weight: 600; line-height: 1.4; color: var(--text); }
+    .article-meta { font-size: 0.75rem; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+    .article-snippet { font-size: 0.8rem; color: #8892a4; line-height: 1.5; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── TABS ── */
+    .tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 2rem 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .content-grid { grid-template-columns: 1fr; }
+      .content-grid.three-col { grid-template-columns: 1fr 1fr; }
+      main { padding: 1rem; }
+    }
+    @media (max-width: 600px) {
+      .content-grid.three-col { grid-template-columns: 1fr; }
+      .signals-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🚗</div>
+      <div class="logo-text">Auto<span>Pulse</span></div>
+    </div>
+    <div class="header-meta">
+      <div class="live-dot">Live Research</div>
+      <div class="date-badge">July 6, 2026 · Product Strategy Edition</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Automotive Strategy Briefing</h1>
+    <p>Your daily AI-curated intelligence feed — covering EVs, software-defined vehicles, autonomous driving, supply chain, consumer trends, and competitive moves.</p>
+  </div>
+
+  <!-- SIGNAL CARDS -->
+  <div class="signals-grid">
+    <div class="signal-card">
+      <div class="signal-label">Global EV Share (2026)</div>
+      <div class="signal-value" style="color: var(--accent3);">25%+</div>
+      <div class="signal-change up">↑ From &lt;10% in 2021</div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-label">US New Car SAAR</div>
+      <div class="signal-value" style="color: var(--accent);">16.1M</div>
+      <div class="signal-change up">↑ +7.2% YoY June</div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-label">Avg. New Vehicle Price</div>
+      <div class="signal-value" style="color: var(--accent4);">$50K+</div>
+      <div class="signal-change neutral">⚠ Affordability pressure</div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-label">SDV Market (2026)</div>
+      <div class="signal-value" style="color: var(--accent2);">$448B</div>
+      <div class="signal-change up">↑ 16% CAGR to 2035</div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-label">US EV Share Q1 2026</div>
+      <div class="signal-value" style="color: var(--accent5);">5.4%</div>
+      <div class="signal-change down">↓ From 10% in Q3 2025</div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-label">Waymo Cities (2026)</div>
+      <div class="signal-value" style="color: var(--accent4);">20+</div>
+      <div class="signal-change up">↑ Expanding rapidly</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('overview')">Overview</button>
+    <button class="tab-btn" onclick="showTab('ev')">⚡ EV Markets</button>
+    <button class="tab-btn" onclick="showTab('sdv')">💻 SDV & AI</button>
+    <button class="tab-btn" onclick="showTab('competitive')">🏁 Competitive</button>
+    <button class="tab-btn" onclick="showTab('consumer')">👥 Consumer</button>
+    <button class="tab-btn" onclick="showTab('articles')">📰 Articles</button>
+  </div>
+
+  <!-- ══ TAB: OVERVIEW ══ -->
+  <div id="tab-overview" class="tab-content active">
+
+    <div class="content-grid">
+      <!-- EV Global Market Share Chart -->
+      <div class="chart-card">
+        <h3>Global EV Market Share by Region</h3>
+        <div class="chart-subtitle">Battery-electric share of new car registrations, 2026</div>
+        <div class="chart-container">
+          <canvas id="evShareChart"></canvas>
+        </div>
+      </div>
+
+      <!-- SDV Market Growth Chart -->
+      <div class="chart-card">
+        <h3>Software-Defined Vehicle Market Growth</h3>
+        <div class="chart-subtitle">Global SDV market size projection ($B), 2024–2035</div>
+        <div class="chart-container">
+          <canvas id="sdvGrowthChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid three-col">
+      <!-- US Sales Trend -->
+      <div class="chart-card">
+        <h3>US Auto Sales SAAR Trend</h3>
+        <div class="chart-subtitle">Seasonally adjusted annual rate (millions)</div>
+        <div class="chart-container">
+          <canvas id="saarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Emerging Markets Radar -->
+      <div class="chart-card">
+        <h3>Technology Adoption Radar</h3>
+        <div class="chart-subtitle">Maturity score by segment (0–10)</div>
+        <div class="chart-container">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Market Size Donut -->
+      <div class="chart-card">
+        <h3>Emerging Auto Tech Markets ($B)</h3>
+        <div class="chart-subtitle">2026 market size comparison</div>
+        <div class="chart-container">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Trends Summary -->
+    <div class="section-header" style="margin-top:0.5rem;">
+      <h2>Today's Top Signals</h2>
+    </div>
+    <div class="trend-cards-grid">
+
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Tesla launches 3-row Model Y L at $63,630 — replaces discontinued Model X</div>
+          <div class="trend-card-source">July 2, 2026</div>
+        </div>
+        <div class="trend-card-body">The Model Y L adds 6 inches of wheelbase for a genuine 2+2+2 layout with 325 miles of range. This is Tesla's only 3-row vehicle now that the Model X is discontinued — a direct play for family SUV buyers currently shopping RAV4, Pilot, and Highlander.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://electrek.co/2026/07/02/tesla-model-y-l-us-launch-61990/" target="_blank">Read →</a>
+        </div>
+      </div>
+
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Honda CR-V dethrones Ford F-150 as America's #1 bestseller in H1 2026</div>
+          <div class="trend-card-source">July 2, 2026</div>
+        </div>
+        <div class="trend-card-body">Honda's CR-V sold 226,114 units in H1 2026, capitalizing on supply shortages at Toyota (RAV4 model changeover) and Ford (F-150 constraints). Strong hybrid demand drove the win. A historic first — the F-150 has dominated for decades.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.carscoops.com/2026/07/honda-cr-v-bestseller/" target="_blank">Read →</a>
+        </div>
+      </div>
+
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">VLA models mark generational leap in automotive AI — end-to-end SDV intelligence</div>
+          <div class="trend-card-source">July 6, 2026</div>
+        </div>
+        <div class="trend-card-body">Vision-Language-Action models now process sensor data and make real-time steering, braking, and navigation decisions. VW's ID Unyx 08 uses Xpeng's ADAS system capable of 1.5 quadrillion calculations/second. The VLA market is projected to grow from $3.89B to $40.5B by 2035.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.autonews.com/technology/ane-end-to-end-ai-sdvs-0706/" target="_blank">Read →</a>
+        </div>
+      </div>
+
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">US EV share collapses to 5.4% in Q1 2026 — down from 10% after IRA credit loss</div>
+          <div class="trend-card-source">July 1, 2026</div>
+        </div>
+        <div class="trend-card-body">The Alliance for Automotive Innovation reports a 39% volume decrease in Q1 2026 EV sales (~148,000 fewer vehicles) vs Q1 2025. The expiration of IRA tax credits is the primary driver. Meanwhile, UK EVs hit 30% share — a stark divergence in policy-driven adoption.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.autosinnovate.org/posts/press-release/2026-q1-get-connected-press-release" target="_blank">Read →</a>
+        </div>
+      </div>
+
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Waymo launches commercially in Nashville, plans 20+ city expansion by year-end</div>
+          <div class="trend-card-source">June 28, 2026</div>
+        </div>
+        <div class="trend-card-body">Waymo transitioned to full public commercial operations in Nashville on June 28, 2026. The company is targeting Miami, Dallas, Houston, San Antonio, and Orlando next. Waymo/Uber Phoenix pilot ended simultaneously — signaling Waymo's shift to direct-to-consumer model.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-medium">Medium Impact</span>
+          <a class="read-link" href="https://www.roadtoautonomy.com/waymo-won-robotaxi-race/" target="_blank">Read →</a>
+        </div>
+      </div>
+
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">25% auto tariffs restored by Court of Appeals — supply chain uncertainty intensifies</div>
+          <div class="trend-card-source">May 30, 2026</div>
+        </div>
+        <div class="trend-card-body">The Court of Appeals temporarily restored 25% tariffs on imported vehicles. USMCA review began July 1 with US demanding structural changes affecting Canada and Mexico manufacturing. OEMs are weighing US production shifts, but reshoring takes years and billions.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.automotive-fleet.com/news/tariff-update-may-30-tariff-shifts-shake-up-auto-industry-as-legal-trade-battles-evolve" target="_blank">Read →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ TAB: EV MARKETS ══ -->
+  <div id="tab-ev" class="tab-content">
+    <div class="section-header">
+      <h2>EV Market Deep Dive</h2>
+      <span class="section-tag tag-ev">Electric Vehicles</span>
+    </div>
+
+    <div class="content-grid">
+      <div class="chart-card">
+        <h3>Global EV Sales Growth (2019–2025)</h3>
+        <div class="chart-subtitle">Annual EV sales worldwide (millions of units)</div>
+        <div class="chart-container tall">
+          <canvas id="evSalesGrowthChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>EV Market Share: US vs. UK vs. Global</h3>
+        <div class="chart-subtitle">BEV share of new car sales by market</div>
+        <div class="chart-container tall">
+          <canvas id="evCompareChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="trend-cards-grid">
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">UK EVs hit 30% market share — organic demand, not just mandates</div>
+          <div class="trend-card-source">Electrek · July 3, 2026</div>
+        </div>
+        <div class="trend-card-body">UK BEV registrations jumped 38% to 64,440 units in June, hitting 29.8% share. Higher fuel prices are shifting buyer math. Tesla rebounded 42% (from a low base), while BYD grew 9%. The ZEV Mandate is forcing supply, but consumer demand is showing up independently.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://electrek.co/2026/07/03/uk-ev-registrations-june-2026-30-percent-share/" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">EVs set to claim 1-in-4 global car sales in 2026 — 10x growth in 6 years</div>
+          <div class="trend-card-source">Yahoo Finance · June 30, 2026</div>
+        </div>
+        <div class="trend-card-body">From under 10% of global sales five years ago to 25%+ in 2026. Approximately 21 million EVs were sold worldwide in 2025. China continues to dominate production and sales, while Europe accelerates under regulatory pressure and the US lags due to policy reversal.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://finance.yahoo.com/energy/articles/evs-set-claim-more-1-200500733.html" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">EV depreciation crisis: values dropped sharply in 2025, outpacing ICE vehicles</div>
+          <div class="trend-card-source">Auto Service World · June 30, 2026</div>
+        </div>
+        <div class="trend-card-body">EV resale values dropped sharply in 2025, compounding losses from 2024 and outpacing ICE vehicle depreciation. Elevated EV depreciation is expected to persist. This creates product strategy challenges for OEMs around residual value guarantees and fleet/lease programs.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-medium">Medium Impact</span>
+          <a class="read-link" href="https://www.autoserviceworld.com/how-the-changing-ev-market-will-impact-the-industry/" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">EV Motor Market: $22B today → $120B by 2036 at 16% CAGR</div>
+          <div class="trend-card-source">OpenPR · July 6, 2026</div>
+        </div>
+        <div class="trend-card-body">The global EV motor market, valued at $22.1B in 2025, is projected to reach $120B by 2036. This signals massive upstream investment opportunity in electric drivetrain components — a key consideration for supplier strategy and vertical integration decisions.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-watch">Watch</span>
+          <a class="read-link" href="https://www.openpr.com/news/4569953/electric-vehicle-motor-market-to-reach-usd-120-billion-by-2036-as" target="_blank">Read →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: SDV & AI ══ -->
+  <div id="tab-sdv" class="tab-content">
+    <div class="section-header">
+      <h2>Software-Defined Vehicles & AI</h2>
+      <span class="section-tag tag-sdv">SDV · AI · Autonomy</span>
+    </div>
+
+    <div class="content-grid">
+      <div class="chart-card">
+        <h3>SDV Market by Region (2024 → 2030)</h3>
+        <div class="chart-subtitle">Market size in $B — North America, Europe, Global</div>
+        <div class="chart-container tall">
+          <canvas id="sdvRegionChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Emerging Auto Tech Markets — CAGR Comparison</h3>
+        <div class="chart-subtitle">Compound annual growth rates by segment</div>
+        <div class="chart-container tall">
+          <canvas id="cagrChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="trend-cards-grid">
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">SDV market: $448B (2026) → $1.7T by 2035 — software becomes the vehicle</div>
+          <div class="trend-card-source">MarketsandMarkets · June 2026</div>
+        </div>
+        <div class="trend-card-body">The global SDV market grows at 16% CAGR. Key drivers: paid ADAS subscriptions, OTA updates, feature-on-demand monetization, and zonal architecture migration. Tesla leads as a "Star Player," NVIDIA as "Progressive Player." Europe is the fastest-growing region at 54.4% CAGR.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.marketsandmarkets.com/Market-Reports/software-defined-vehicles-market-187205966.html" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Vision-Language-Action models: the next leap in automotive AI capabilities</div>
+          <div class="trend-card-source">Automotive News · July 6, 2026</div>
+        </div>
+        <div class="trend-card-body">VLA models represent a generational leap — cars process sensor data and make real-time decisions about steering, braking, and navigation using AI reasoning. VW's ID Unyx 08 already uses Xpeng's system with 1.5 quadrillion calculations/second. The VLA market grows from $3.89B to $40.5B by 2035 (26.4% CAGR).</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.autonews.com/technology/ane-end-to-end-ai-sdvs-0706/" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">AMD expands into self-driving with Turing deal — AI chip wars reach automotive</div>
+          <div class="trend-card-source">Yahoo Finance · July 6, 2026</div>
+        </div>
+        <div class="trend-card-body">Turing Inc. integrated AMD AI accelerators into its autonomous vehicle systems, challenging NVIDIA's dominant position in automotive AI compute. Turing (Japan) also raised ¥27.89B for autonomous driving development. The semiconductor battle for automotive AI is intensifying.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-medium">Medium Impact</span>
+          <a class="read-link" href="https://finance.yahoo.com/technology/ai/articles/amd-amd-expands-self-driving-080903338.html" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Connected vehicle fleet surpasses 400M units — data monetization at $3.78B</div>
+          <div class="trend-card-source">Fortune Business Insights · 2026</div>
+        </div>
+        <div class="trend-card-body">The global connected vehicle fleet exceeded 400 million units in 2026. Automotive data monetization platforms are valued at $3.78B, growing to $14.62B by 2034 (18.4% CAGR). OEMs are building new revenue streams from vehicle data — insurance, fleet optimization, predictive maintenance, and in-car commerce.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-watch">Watch</span>
+          <a class="read-link" href="https://www.fortunebusinessinsights.com/automotive-data-monetization-platforms-market-116129" target="_blank">Read →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: COMPETITIVE ══ -->
+  <div id="tab-competitive" class="tab-content">
+    <div class="section-header">
+      <h2>Competitive Landscape</h2>
+      <span class="section-tag tag-competitive">OEM Moves · Market Share</span>
+    </div>
+
+    <div class="content-grid">
+      <div class="chart-card">
+        <h3>US H1 2026 — Top Selling Vehicles</h3>
+        <div class="chart-subtitle">Units sold, first half 2026</div>
+        <div class="chart-container tall">
+          <canvas id="topSellersChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>EV Brand Battle — UK June 2026</h3>
+        <div class="chart-subtitle">BEV registrations by brand (units)</div>
+        <div class="chart-container tall">
+          <canvas id="evBrandChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="trend-cards-grid">
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Honda CR-V: 226,114 units in H1 — historic dethroning of F-150 and RAV4</div>
+          <div class="trend-card-source">Automotive News · July 2, 2026</div>
+        </div>
+        <div class="trend-card-body">Honda's CR-V became America's #1 bestselling vehicle in H1 2026 by capitalizing on supply shortages at Toyota (RAV4 model changeover) and Ford (F-150 constraints). Strong hybrid demand was a key differentiator. This is the first time in decades the F-150 has not led the market.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.carscoops.com/2026/07/honda-cr-v-bestseller/" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">BYD outsells Tesla across Europe in multiple months — UK still Tesla's stronghold</div>
+          <div class="trend-card-source">Electrek · July 1, 2026</div>
+        </div>
+        <div class="trend-card-body">BYD has outsold Tesla across the broader European market in multiple months in 2026. In the UK specifically, Tesla still leads (12,403 vs BYD's 2,999 in June), but BYD's momentum is undeniable. The Chinese brand's triple-digit growth rates are normalizing as dealer networks mature.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://electrek.co/2026/07/01/byd-tesla-q2-2026-bev-sales/" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Chinese auto industry: 10M+ units in 4 months — structural transformation underway</div>
+          <div class="trend-card-source">ScienceDirect · June 30, 2026</div>
+        </div>
+        <div class="trend-card-body">China produced and sold over 10 million units in the first four months of 2025 alone. The Chinese automotive industry is undergoing structural transformation driven by technological disruption, decarbonization pressures, and geopolitical realignment. Chinese OEMs are increasingly competing on software and AI, not just price.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.sciencedirect.com/science/article/pii/S2666188826002741" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">NIO delivers 40,597 vehicles in June — +62.9% YoY, new 2026 high</div>
+          <div class="trend-card-source">NIO · July 2026</div>
+        </div>
+        <div class="trend-card-body">NIO set a new 2026 monthly delivery record in June with 40,597 vehicles, representing 62.9% year-over-year growth. Chinese premium EV brands are accelerating while legacy Western OEMs navigate tariff and supply chain headwinds. NIO's battery swap network continues to differentiate its proposition.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-medium">Medium Impact</span>
+          <a class="read-link" href="https://www.instagram.com/p/DaPbc23kfX6/" target="_blank">Read →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: CONSUMER ══ -->
+  <div id="tab-consumer" class="tab-content">
+    <div class="section-header">
+      <h2>Consumer Behavior & Market Dynamics</h2>
+      <span class="section-tag tag-consumer">Consumer · Affordability</span>
+    </div>
+
+    <div class="content-grid">
+      <div class="chart-card">
+        <h3>New Vehicle Affordability Squeeze</h3>
+        <div class="chart-subtitle">Average transaction price vs. monthly payment trend</div>
+        <div class="chart-container tall">
+          <canvas id="affordabilityChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Buyer Age Shift — New Vehicle Registrations</h3>
+        <div class="chart-subtitle">Share of new vehicle registrations by age group</div>
+        <div class="chart-container tall">
+          <canvas id="ageChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="trend-cards-grid">
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Average new car crosses $50K — 1 in 5 buyers paying over $1,000/month</div>
+          <div class="trend-card-source">Cox Automotive · June 30, 2026</div>
+        </div>
+        <div class="trend-card-body">Average new vehicle MSRP has been north of $51,000 since January 2026. Monthly payments are up 30% over four years. Nearly one in five new vehicles now carries a payment over $1,000/month. Loan terms are stretching to 84 months, raising negative equity concerns for dealers and lenders.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.coxautoinc.com/insights/vehicle-affordability-in-america-the-car-is-not-the-villain/" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">"Perfect storm" — Bain projects US auto market shrinks by 2M+ units by 2040</div>
+          <div class="trend-card-source">CNBC · June 28, 2026</div>
+        </div>
+        <div class="trend-card-body">Falling birth rates, behavioral changes, high prices, and growing alternatives (robotaxis, rideshare) could drive US sales down by 2M+ units by 2040. Half of 16-year-olds today don't have a driver's license (vs. 70% in 1966–1984). The industry faces a demographic cliff — competition will become "ferocious."</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-high">High Impact</span>
+          <a class="read-link" href="https://www.cnbc.com/2026/06/28/us-auto-market.html" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">Young buyers (18–34) drop to under 10% of new registrations — 55+ dominate</div>
+          <div class="trend-card-source">S&P Global Mobility · 2026</div>
+        </div>
+        <div class="trend-card-body">The share of new vehicle registrations among 18–34 year-olds fell from 12% (Q1 2021) to under 10% (mid-2025). Buyers 55 and older now account for nearly half of all new registrations and have held the largest share for eight straight quarters. Affordability is the primary driver of this demographic shift.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-medium">Medium Impact</span>
+          <a class="read-link" href="https://www.cnbc.com/2026/06/28/us-auto-market.html" target="_blank">Read →</a>
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-card-header">
+          <div class="trend-card-title">US aftermarket forecast to surpass $500B by 2029 — vehicles lasting record 12.8 years</div>
+          <div class="trend-card-source">BRAKE Report · July 3, 2026</div>
+        </div>
+        <div class="trend-card-body">The US light-duty automotive aftermarket is projected to grow 5.2% in 2026 and surpass $500B by 2029. Vehicles are lasting a record 12.8 years on average — driven by high new car prices keeping owners in their existing vehicles longer. This creates a significant opportunity for parts, service, and software update businesses.</div>
+        <div class="trend-card-footer">
+          <span class="impact-badge impact-watch">Watch</span>
+          <a class="read-link" href="https://thebrakereport.com/us-automotive-aftermarket-forecast-2026/" target="_blank">Read →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: ARTICLES ══ -->
+  <div id="tab-articles" class="tab-content">
+    <div class="section-header">
+      <h2>Curated Reading List</h2>
+      <span class="section-tag tag-consumer">Must-Read Articles</span>
+    </div>
+    <div class="articles-grid">
+
+      <a class="article-card" href="https://www.autonews.com/technology/ane-end-to-end-ai-sdvs-0706/" target="_blank">
+        <div class="article-tag">SDV · AI</div>
+        <div class="article-title">Why VLA models mark a generational leap in automotive AI capabilities</div>
+        <div class="article-meta"><span>Automotive News</span><span>·</span><span>July 6, 2026</span></div>
+        <div class="article-snippet">Vision-language-action models transform SDVs into AI-powered predictive systems capable of real-time driving decisions.</div>
+      </a>
+
+      <a class="article-card" href="https://electrek.co/2026/07/02/tesla-model-y-l-us-launch-61990/" target="_blank">
+        <div class="article-tag">Product Launch</div>
+        <div class="article-title">Tesla launches Model Y L in US — 6 seats, 325 miles, $61,990</div>
+        <div class="article-meta"><span>Electrek</span><span>·</span><span>July 2, 2026</span></div>
+        <div class="article-snippet">The stretched wheelbase and 2+2+2 layout make the third row usable in a way the standard Model Y's jump seats never were.</div>
+      </a>
+
+      <a class="article-card" href="https://www.cnbc.com/2026/06/28/us-auto-market.html" target="_blank">
+        <div class="article-tag">Market Outlook</div>
+        <div class="article-title">A 'perfect storm' points to a much smaller U.S. auto market by 2040</div>
+        <div class="article-meta"><span>CNBC</span><span>·</span><span>June 28, 2026</span></div>
+        <div class="article-snippet">Bain & Company cites slowing population growth, behavioral changes, and high prices as reasons for a 2M+ unit decline by 2040.</div>
+      </a>
+
+      <a class="article-card" href="https://electrek.co/2026/07/03/uk-ev-registrations-june-2026-30-percent-share/" target="_blank">
+        <div class="article-tag">EV Markets</div>
+        <div class="article-title">UK EV registrations hit 30% share in June as Tesla rebounds 42%</div>
+        <div class="article-meta"><span>Electrek</span><span>·</span><span>July 3, 2026</span></div>
+        <div class="article-snippet">British BEV registrations jumped 38% to 64,440 units — organic demand driven by fuel prices, not just mandates.</div>
+      </a>
+
+      <a class="article-card" href="https://www.autosinnovate.org/posts/press-release/2026-q1-get-connected-press-release" target="_blank">
+        <div class="article-tag">EV Policy</div>
+        <div class="article-title">Alliance for Automotive Innovation: US EV share drops 3.4 points in Q1 2026</div>
+        <div class="article-meta"><span>Alliance for Auto Innovation</span><span>·</span><span>July 1, 2026</span></div>
+        <div class="article-snippet">39% decrease in EV volume (~148,000 vehicles) following expiration of IRA tax credits — a stark policy impact signal.</div>
+      </a>
+
+      <a class="article-card" href="https://www.carscoops.com/2026/07/honda-cr-v-bestseller/" target="_blank">
+        <div class="article-tag">Competitive</div>
+        <div class="article-title">Honda's CR-V Is America's New Best-Seller As F-150 And RAV4 Stumble</div>
+        <div class="article-meta"><span>Carscoops</span><span>·</span><span>July 2, 2026</span></div>
+        <div class="article-snippet">226,114 units in H1 2026 — Honda capitalizes on supply shortages at Toyota and Ford with strong hybrid demand.</div>
+      </a>
+
+      <a class="article-card" href="https://www.roadtoautonomy.com/waymo-won-robotaxi-race/" target="_blank">
+        <div class="article-tag">Autonomy</div>
+        <div class="article-title">Waymo Won the Robotaxi Race, While Detroit Walked Away Twice</div>
+        <div class="article-meta"><span>Road to Autonomy</span><span>·</span><span>June 30, 2026</span></div>
+        <div class="article-snippet">Waymo has officially transitioned to public commercial robotaxi operations in Nashville, with 20+ cities planned by year-end.</div>
+      </a>
+
+      <a class="article-card" href="https://www.marketsandmarkets.com/Market-Reports/software-defined-vehicles-market-187205966.html" target="_blank">
+        <div class="article-tag">SDV Research</div>
+        <div class="article-title">Software Defined Vehicle Market: $448B (2026) → $1.7T by 2035</div>
+        <div class="article-meta"><span>MarketsandMarkets</span><span>·</span><span>June 2026</span></div>
+        <div class="article-snippet">Comprehensive market analysis covering SDV types, E/E architecture, applications, and competitive landscape.</div>
+      </a>
+
+      <a class="article-card" href="https://www.automotive-fleet.com/news/tariff-update-may-30-tariff-shifts-shake-up-auto-industry-as-legal-trade-battles-evolve" target="_blank">
+        <div class="article-tag">Supply Chain</div>
+        <div class="article-title">Tariff Shifts Shake Up Auto Industry as Legal Trade Battles Evolve</div>
+        <div class="article-meta"><span>Automotive Fleet</span><span>·</span><span>May 30, 2026</span></div>
+        <div class="article-snippet">25% tariffs restored by Court of Appeals — costs, supply chains, and the policy landscape remain deeply uncertain.</div>
+      </a>
+
+      <a class="article-card" href="https://www.coxautoinc.com/insights/vehicle-affordability-in-america-the-car-is-not-the-villain/" target="_blank">
+        <div class="article-tag">Consumer</div>
+        <div class="article-title">Vehicle Affordability in America: The Car Is Not the Villain</div>
+        <div class="article-meta"><span>Cox Automotive</span><span>·</span><span>June 30, 2026</span></div>
+        <div class="article-snippet">Average new-vehicle MSRP north of $51,000 — but the real story is income stagnation, interest rates, and loan structure.</div>
+      </a>
+
+      <a class="article-card" href="https://finance.yahoo.com/energy/articles/evs-set-claim-more-1-200500733.html" target="_blank">
+        <div class="article-tag">EV Markets</div>
+        <div class="article-title">EVs are set to claim more than 1 in 4 car sales worldwide in 2026</div>
+        <div class="article-meta"><span>Yahoo Finance</span><span>·</span><span>June 30, 2026</span></div>
+        <div class="article-snippet">From under 10% five years ago to 25%+ in 2026 — the tenfold growth story of global EV adoption.</div>
+      </a>
+
+      <a class="article-card" href="https://www.sciencedirect.com/science/article/pii/S2666188826002741" target="_blank">
+        <div class="article-tag">China Strategy</div>
+        <div class="article-title">A strategic analysis of the Chinese automotive industry</div>
+        <div class="article-meta"><span>ScienceDirect</span><span>·</span><span>June 30, 2026</span></div>
+        <div class="article-snippet">China produced 10M+ units in 4 months of 2025 — structural transformation driven by tech disruption and geopolitics.</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- MARKET DATA TABLE -->
+  <div class="divider"></div>
+  <div class="section-header">
+    <h2>Market Size Reference Table</h2>
+  </div>
+  <div class="data-table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Market Segment</th>
+          <th>2025/2026 Size</th>
+          <th>2030/2035/2036 Projection</th>
+          <th>CAGR</th>
+          <th>Key Driver</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Software-Defined Vehicles (Global)</td>
+          <td>$447.55B (2026)</td>
+          <td>$1,707.36B (2035)</td>
+          <td><span class="cagr-pill">16.0%</span></td>
+          <td>OTA updates, ADAS subscriptions</td>
+        </tr>
+        <tr>
+          <td>SDV — North America</td>
+          <td>$38.76B (2024)</td>
+          <td>$254.42B (2030)</td>
+          <td><span class="cagr-pill high">36.8%</span></td>
+          <td>Centralized compute, zonal architecture</td>
+        </tr>
+        <tr>
+          <td>SDV — Europe</td>
+          <td>$21.16B (2024)</td>
+          <td>$287.24B (2030)</td>
+          <td><span class="cagr-pill high">54.4%</span></td>
+          <td>Regulatory mandates, OEM investment</td>
+        </tr>
+        <tr>
+          <td>Autonomous Vehicle Market</td>
+          <td>$273.75B (2025)</td>
+          <td>$364.08B (2026)</td>
+          <td><span class="cagr-pill">Growing</span></td>
+          <td>Robotaxi expansion, ADAS adoption</td>
+        </tr>
+        <tr>
+          <td>Vision-Language-Action (VLA) Models</td>
+          <td>$3.89B (2025)</td>
+          <td>$40.50B (2035)</td>
+          <td><span class="cagr-pill high">26.4%</span></td>
+          <td>End-to-end AI driving systems</td>
+        </tr>
+        <tr>
+          <td>Automotive Data Monetization</td>
+          <td>$3.78B (2026)</td>
+          <td>$14.62B (2034)</td>
+          <td><span class="cagr-pill">18.4%</span></td>
+          <td>400M+ connected vehicles</td>
+        </tr>
+        <tr>
+          <td>EV Motor Market</td>
+          <td>$22.1B (2025)</td>
+          <td>$120B (2036)</td>
+          <td><span class="cagr-pill">16.0%</span></td>
+          <td>EV adoption, drivetrain electrification</td>
+        </tr>
+        <tr>
+          <td>US Automotive Aftermarket</td>
+          <td>$211.14B (2026)</td>
+          <td>$281.23B (2031)</td>
+          <td><span class="cagr-pill">5.9%</span></td>
+          <td>Aging fleet, 12.8-yr avg vehicle age</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <p>AutoPulse Daily Briefing · Powered by AI Research · <strong>July 6, 2026</strong> · For Product Strategy Use</p>
+  <p style="margin-top:0.5rem;">Sources: Cox Automotive, Electrek, Automotive News, MarketsandMarkets, CNBC, Alliance for Automotive Innovation, Road to Autonomy, and more. <a href="#" onclick="return false;">Subscribe for daily updates</a></p>
+</footer>
+
+<script>
+// ── TAB LOGIC ──
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── CHART DEFAULTS ──
+Chart.defaults.color = '#8892a4';
+Chart.defaults.borderColor = '#2a2f3d';
+Chart.defaults.font.family = 'Inter, -apple-system, sans-serif';
+Chart.defaults.font.size = 11;
+
+const COLORS = {
+  blue: '#3b82f6',
+  indigo: '#6366f1',
+  green: '#10b981',
+  amber: '#f59e0b',
+  red: '#ef4444',
+  purple: '#a855f7',
+  cyan: '#06b6d4',
+  pink: '#ec4899',
+};
+
+function makeGradient(ctx, color, alpha1 = 0.4, alpha2 = 0.02) {
+  const g = ctx.createLinearGradient(0, 0, 0, 300);
+  g.addColorStop(0, color.replace(')', `, ${alpha1})`).replace('rgb', 'rgba'));
+  g.addColorStop(1, color.replace(')', `, ${alpha2})`).replace('rgb', 'rgba'));
+  return g;
+}
+
+// ── CHART 1: EV Share by Region (bar) ──
+new Chart(document.getElementById('evShareChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UK\nJune 2026', 'Global\n2026', 'EU YTD\nApr 2026', 'Canada\n2025', 'US\nQ1 2026'],
+    datasets: [{
+      label: 'BEV Market Share (%)',
+      data: [29.8, 25.2, 19.7, 9.5, 5.4],
+      backgroundColor: [COLORS.green, COLORS.blue, COLORS.indigo, COLORS.amber, COLORS.red],
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw}% EV share` } } },
+    scales: {
+      y: { beginAtZero: true, max: 35, ticks: { callback: v => v + '%' }, grid: { color: '#1e2330' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 2: SDV Growth ──
+new Chart(document.getElementById('sdvGrowthChart'), {
+  type: 'line',
+  data: {
+    labels: ['2024', '2025', '2026', '2027', '2028', '2030', '2032', '2035'],
+    datasets: [{
+      label: 'SDV Market ($B)',
+      data: [390, 390.65, 447.55, 520, 610, 800, 1100, 1707],
+      borderColor: COLORS.indigo,
+      backgroundColor: 'rgba(99,102,241,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: COLORS.indigo,
+      pointRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` $${ctx.raw}B` } } },
+    scales: {
+      y: { ticks: { callback: v => '$' + v + 'B' }, grid: { color: '#1e2330' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 3: SAAR ──
+new Chart(document.getElementById('saarChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'SAAR (M)',
+      data: [15.4, 15.7, 16.0, 16.1, 16.0, 16.1],
+      borderColor: COLORS.blue,
+      backgroundColor: 'rgba(59,130,246,0.1)',
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: COLORS.blue,
+      pointRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw}M SAAR` } } },
+    scales: {
+      y: { min: 14.5, max: 17, ticks: { callback: v => v + 'M' }, grid: { color: '#1e2330' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 4: Radar ──
+new Chart(document.getElementById('radarChart'), {
+  type: 'radar',
+  data: {
+    labels: ['EV Adoption', 'SDV/OTA', 'Autonomy', 'Data Monetization', 'Connectivity', 'AI Features'],
+    datasets: [
+      {
+        label: 'China',
+        data: [9, 8, 7, 8, 9, 8],
+        borderColor: COLORS.red,
+        backgroundColor: 'rgba(239,68,68,0.1)',
+        pointBackgroundColor: COLORS.red,
+      },
+      {
+        label: 'US',
+        data: [5, 7, 8, 6, 7, 7],
+        borderColor: COLORS.blue,
+        backgroundColor: 'rgba(59,130,246,0.1)',
+        pointBackgroundColor: COLORS.blue,
+      },
+      {
+        label: 'Europe',
+        data: [7, 8, 6, 7, 8, 7],
+        borderColor: COLORS.green,
+        backgroundColor: 'rgba(16,185,129,0.1)',
+        pointBackgroundColor: COLORS.green,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } } },
+    scales: { r: { min: 0, max: 10, ticks: { display: false }, grid: { color: '#2a2f3d' }, pointLabels: { font: { size: 10 } } } }
+  }
+});
+
+// ── CHART 5: Donut ──
+new Chart(document.getElementById('donutChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['SDV Global', 'AV Market', 'EV Motors', 'Data Monetization', 'VLA Models'],
+    datasets: [{
+      data: [447.55, 273.75, 22.1, 3.78, 3.89],
+      backgroundColor: [COLORS.indigo, COLORS.blue, COLORS.green, COLORS.amber, COLORS.purple],
+      borderWidth: 2,
+      borderColor: '#161a23',
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: {
+      legend: { position: 'right', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } },
+      tooltip: { callbacks: { label: ctx => ` $${ctx.raw}B` } }
+    }
+  }
+});
+
+// ── CHART 6: EV Sales Growth ──
+new Chart(document.getElementById('evSalesGrowthChart'), {
+  type: 'bar',
+  data: {
+    labels: ['2019', '2020', '2021', '2022', '2023', '2024', '2025'],
+    datasets: [{
+      label: 'Global EV Sales (M)',
+      data: [2.1, 3.0, 6.5, 10.5, 14.0, 17.5, 21.0],
+      backgroundColor: COLORS.green,
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw}M EVs sold` } } },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => v + 'M' }, grid: { color: '#1e2330' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 7: EV Compare ──
+new Chart(document.getElementById('evCompareChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Q3 2025', 'Q4 2025', 'Q1 2026', 'June 2026'],
+    datasets: [
+      {
+        label: 'US',
+        data: [10.0, 8.5, 5.4, 6.2],
+        backgroundColor: COLORS.blue,
+        borderRadius: 4,
+      },
+      {
+        label: 'UK',
+        data: [22.0, 24.5, 26.0, 29.8],
+        backgroundColor: COLORS.green,
+        borderRadius: 4,
+      },
+      {
+        label: 'Global',
+        data: [20.0, 22.0, 23.5, 25.2],
+        backgroundColor: COLORS.indigo,
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } }, tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.raw}%` } } },
+    scales: {
+      y: { beginAtZero: true, ticks: { callback: v => v + '%' }, grid: { color: '#1e2330' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 8: SDV Region ──
+new Chart(document.getElementById('sdvRegionChart'), {
+  type: 'bar',
+  data: {
+    labels: ['North America', 'Europe', 'Global (÷10)'],
+    datasets: [
+      {
+        label: '2024 ($B)',
+        data: [38.76, 21.16, 39.0],
+        backgroundColor: 'rgba(59,130,246,0.6)',
+        borderRadius: 4,
+      },
+      {
+        label: '2030 ($B)',
+        data: [254.42, 287.24, 170.7],
+        backgroundColor: COLORS.indigo,
+        borderRadius: 4,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } }, tooltip: { callbacks: { label: ctx => ` $${ctx.raw}B` } } },
+    scales: {
+      y: { ticks: { callback: v => '$' + v + 'B' }, grid: { color: '#1e2330' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 9: CAGR Comparison ──
+new Chart(document.getElementById('cagrChart'), {
+  type: 'bar',
+  data: {
+    labels: ['SDV Europe', 'SDV N. America', 'VLA Models', 'Auto Data', 'EV Motors', 'SDV Global', 'US Aftermarket'],
+    datasets: [{
+      label: 'CAGR (%)',
+      data: [54.4, 36.8, 26.4, 18.4, 16.0, 16.0, 5.9],
+      backgroundColor: [COLORS.purple, COLORS.indigo, COLORS.blue, COLORS.cyan, COLORS.green, COLORS.amber, COLORS.red],
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw}% CAGR` } } },
+    scales: {
+      x: { ticks: { callback: v => v + '%' }, grid: { color: '#1e2330' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 10: Top Sellers ──
+new Chart(document.getElementById('topSellersChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Honda CR-V', 'Ford F-150', 'Toyota RAV4', 'Chevy Silverado', 'Tesla Model Y'],
+    datasets: [{
+      label: 'H1 2026 Units Sold',
+      data: [226114, 210000, 195000, 185000, 95000],
+      backgroundColor: [COLORS.green, COLORS.blue, COLORS.red, COLORS.amber, COLORS.indigo],
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toLocaleString()} units` } } },
+    scales: {
+      x: { ticks: { callback: v => (v/1000) + 'K' }, grid: { color: '#1e2330' } },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 11: EV Brand UK ──
+new Chart(document.getElementById('evBrandChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Tesla', 'VW Group', 'Hyundai/Kia', 'Stellantis', 'BMW Group', 'BYD', 'Others'],
+    datasets: [{
+      label: 'UK BEV Registrations (June 2026)',
+      data: [12403, 12800, 6400, 5800, 5200, 2999, 18838],
+      backgroundColor: [COLORS.red, COLORS.blue, COLORS.green, COLORS.amber, COLORS.indigo, COLORS.cyan, '#64748b'],
+      borderRadius: 6,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw.toLocaleString()} units` } } },
+    scales: {
+      y: { ticks: { callback: v => (v/1000).toFixed(0) + 'K' }, grid: { color: '#1e2330' } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 12: Affordability ──
+new Chart(document.getElementById('affordabilityChart'), {
+  type: 'line',
+  data: {
+    labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026'],
+    datasets: [
+      {
+        label: 'Avg Transaction Price ($K)',
+        data: [38.5, 42.0, 46.0, 48.5, 49.0, 50.2, 51.0],
+        borderColor: COLORS.amber,
+        backgroundColor: 'rgba(245,158,11,0.1)',
+        fill: true,
+        tension: 0.4,
+        yAxisID: 'y',
+        pointBackgroundColor: COLORS.amber,
+        pointRadius: 4,
+      },
+      {
+        label: 'Avg Monthly Payment ($)',
+        data: [520, 580, 680, 730, 760, 800, 850],
+        borderColor: COLORS.red,
+        backgroundColor: 'rgba(239,68,68,0.05)',
+        fill: false,
+        tension: 0.4,
+        yAxisID: 'y1',
+        pointBackgroundColor: COLORS.red,
+        pointRadius: 4,
+        borderDash: [5, 5],
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } } },
+    scales: {
+      y: { ticks: { callback: v => '$' + v + 'K' }, grid: { color: '#1e2330' }, position: 'left' },
+      y1: { ticks: { callback: v => '$' + v }, grid: { display: false }, position: 'right' },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// ── CHART 13: Age Distribution ──
+new Chart(document.getElementById('ageChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['55+ years', '35–54 years', '18–34 years', 'Under 18'],
+    datasets: [{
+      data: [48, 42, 9, 1],
+      backgroundColor: [COLORS.blue, COLORS.indigo, COLORS.amber, COLORS.red],
+      borderWidth: 2,
+      borderColor: '#161a23',
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: { position: 'bottom', labels: { boxWidth: 10, padding: 10, font: { size: 10 } } },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}%` } }
+    }
+  }
+});
+
+</script>
+</body>
+</html>
