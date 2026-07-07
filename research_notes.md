@@ -1,12 +1,14 @@
 # Automotive Industry Daily Briefing - Research Notes
-## Date: July 6, 2026
+## Date: July 7, 2026
 
 ---
 
 ## TREND 1: EV Market — Global Surge, US Slowdown
 ### Key Data Points
 - **Global EV sales**: ~21 million EVs sold worldwide in 2025 (10x growth in 6 years); EVs now >25% of global new car sales in 2026
+- **Global Outlook**: Global sales forecast to be down 4% in 2026 due to shrinking developed markets and competitive displacement by Chinese OEMs.
 - **UK**: BEV registrations hit 29.8% share in June 2026 (64,440 units), up 38% YoY; Tesla +42%, BYD +9%
+- **Australia**: BEV registrations hit 23.5% share in June 2026 (record month).
 - **US**: EV market share declined 3.4 percentage points in Q1 2026 vs Q1 2025; 39% decrease in EV volume (~148,000 vehicles) — largely due to loss of IRA tax credits
 - **US EV share**: Was ~10% in Q3 2025, dropped to 5.4% in Q1 2026
 - **Canada**: EV sales share dropped from 14.7% (2024) to 9.5% (2025)
@@ -27,8 +29,10 @@
 ## TREND 2: Software-Defined Vehicles (SDV) — The Platform Shift
 ### Key Data Points
 - **SDV Market Size**: $447.55B in 2026 → $1,707.36B by 2035 (CAGR 16%)
+- **Mazda CX-5**: Adopts Panasonic Cockpit Domain Controller (CDC) for its new SDV platform; features OTA updates, Unity 3D engine graphics, and centralized control of IVI, HUD, and cluster.
 - **North America SDV**: $38.76B (2024) → $254.42B by 2030 (CAGR 36.8%)
 - **Europe SDV**: $21.16B (2024) → $287.24B by 2030 (CAGR 54.4%) — fastest growing region
+- **Hardware**: New 25Gbps Automotive Ethernet connectors launched to support high-bandwidth SDV requirements.
 - **Key drivers**: Paid ADAS subscriptions, OTA updates, feature-on-demand monetization, zonal architecture migration
 - **Key players**: Tesla (Star Player), Rivian (Emerging Leader), NVIDIA (Progressive Player), Amazon (Responsive)
 - **VLA Models**: Vision-Language-Action models represent a generational leap — cars process sensor data and make real-time decisions about steering, braking, navigation
@@ -67,7 +71,8 @@
 - **25% Auto Tariffs**: Court of Appeals temporarily restored 25% tariffs on imported vehicles; significant cost/supply chain uncertainty
 - **USMCA Review**: July 1, 2026 USMCA review — US demanding changes that could force Canada/Mexico to surrender trade advantages
 - **Reshoring**: Survey shows companies accelerating US manufacturing reshoring due to tariff uncertainty
-- **Industry impact**: Tight inventory after strong holiday sales; some OEMs weighing US production shifts
+- **Industry impact**: Tight inventory after strong holiday sales; some OEMs weighing US production shifts.
+- **Lender/Dealer Split**: Divergent outlooks for H2 2026; lenders concerned about risk management while dealers struggle with mixed consumer demand.
 - **Chinese Auto**: China produced/sold 10M+ units in first 4 months of 2025 alone; structural transformation driven by tech disruption and geopolitics
 - **Honda CR-V**: Became America's #1 bestselling vehicle in H1 2026 (226,114 units) — capitalizing on Toyota RAV4 and Ford F-150 supply shortages due to model changeovers
 
@@ -132,6 +137,7 @@
 |--------|---------|
 | Global (2026) | >25% |
 | UK June 2026 | 29.8% |
+| Australia June 2026 | 23.5% |
 | EU YTD April 2026 | 19.7% |
 | US Q1 2026 | 5.4% |
 | Canada 2025 | 9.5% |
