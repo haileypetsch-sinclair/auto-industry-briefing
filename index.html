@@ -167,6 +167,7 @@
     .tag-supply { background: rgba(239,68,68,0.15); color: var(--accent5); }
     .tag-consumer { background: rgba(59,130,246,0.15); color: var(--accent); }
     .tag-competitive { background: rgba(168,85,247,0.15); color: #a855f7; }
+    .tag-team { background: rgba(236,72,153,0.15); color: #ec4899; }
 
     /* ── MAIN GRID ── */
     .content-grid {
@@ -358,7 +359,10 @@
       margin-bottom: 1.5rem;
       border-bottom: 1px solid var(--border);
       padding-bottom: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .tab-bar::-webkit-scrollbar { display: none; }
     .tab-btn {
       background: none;
       border: none;
@@ -370,11 +374,35 @@
       border-bottom: 2px solid transparent;
       transition: all 0.2s;
       margin-bottom: -1px;
+      white-space: nowrap;
     }
     .tab-btn:hover { color: var(--text); }
     .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    /* ── TEAM SUBMISSIONS ── */
+    .team-empty {
+      text-align: center;
+      padding: 3rem;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+      color: var(--muted);
+    }
+    .team-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      transition: all 0.2s;
+    }
+    .team-btn:hover { background: #2563eb; transform: scale(1.02); }
 
     /* ── DIVIDER ── */
     .divider {
@@ -461,6 +489,7 @@
     <button class="tab-btn" onclick="showTab('sdv')">💻 SDV & AI</button>
     <button class="tab-btn" onclick="showTab('competitive')">🏁 Competitive</button>
     <button class="tab-btn" onclick="showTab('consumer')">👥 Consumer</button>
+    <button class="tab-btn" onclick="showTab('team')">🤝 Team Submissions</button>
     <button class="tab-btn" onclick="showTab('articles')">📰 Articles</button>
   </div>
 
@@ -619,6 +648,26 @@
             <a href="https://www.autofinancenews.net/allposts/risk-management/lenders-dealers-split-on-2026-outlook-in-challenging-market/" class="read-link">Read →</a>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB: TEAM SUBMISSIONS ══ -->
+  <div id="tab-team" class="tab-content">
+    <div class="trend-section">
+      <div class="section-header">
+        <div class="section-tag tag-team">Team Submissions</div>
+        <h2>Shared by Your Team</h2>
+      </div>
+      
+      <!-- This section is dynamically updated by the AI research script -->
+      <div id="team-links-container" class="trend-cards-grid">
+        <!-- TEAM_LINKS_START -->
+        <div class="team-empty">
+          <p>No team submissions yet. Share a link via GitHub Issues to see it here!</p>
+          <a href="https://github.com/haileypetsch-sinclair/auto-industry-briefing/issues/new" class="team-btn" target="_blank">+ Share a Link</a>
+        </div>
+        <!-- TEAM_LINKS_END -->
       </div>
     </div>
   </div>
